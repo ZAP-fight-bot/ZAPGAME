@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Zap Battle Royale</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #0c0c0c;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .battlefield {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .character {
+      width: 250px;
+      margin: 10px;
+    }
+    .hp-bar {
+      height: 20px;
+      background: #555;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .hp-fill {
+      height: 100%;
+      background: #00ff00;
+      width: 100%;
+      transition: width 0.5s ease;
+    }
+    .actions {
+      margin-top: 30px;
+    }
+    button {
+      background-color: #ffa500;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .log {
+      margin-top: 30px;
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚡ Zap Battle Royale 🐸🦍🐶</h1>
+  <div class="battlefield">
+    <div class="character" id="zap">
+      <h2>Zap</h2>
+      <div class="hp-bar"><div id="zapHPBar" class="hp-fill"></div></div>
+      <p>HP: <span id="zapHPText">100</span></p>
+      <img src="https://i.imgur.com/QBZPwJv.png" alt="Zap" width="150">
+    </div>
+    <div class="character" id="enemy">
+      <h2 id="enemyName">PEPE</h2>
+      <div class="hp-bar"><div id="enemyHPBar" class="hp-fill"></div></div>
+      <p>HP: <span id="enemyHPText">100</span></p>
+      <img id="enemyImg" src="https://i.imgur.com/K9jF1jL.png" alt="Enemy" width="150">
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="attack()">⚡ Zap Attack</button>
+    <button onclick="heal()">🧃 Zap Heal</button>
+  </div>
+
+  <div class="log" id="log">
+    <p>Zap steps into the battlefield against PEPE!</p>
+  </div>
+
+  <script>
+    let zapHP = 100;
+    let enemyHP = 100;
+    let currentEnemy = 0;
+
+    const enemies = [
+      { name: "PEPE", img: "https://i.imgur.com/K9jF1jL.png", hp: 100 },
+      { name: "BONK", img: "https://i.imgur.com/yy02pBd.png", hp: 110 },
+      { name: "DOGE", img: "https://i.imgur.com/wXJbDY5.png", hp: 120 },
+      { name: "POPCAT", img: "https://i.imgur.com/S54t4dR.png", hp: 130 }
+    ];
+
+    function logMessage(message) {
+      const log = document.getElementById("log");
+      log.innerHTML += "<p>" + message + "</p>";
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function updateHPBars() {
+      document.getElementById("zapHPText").innerText = Math.max(zapHP, 0);
+      document.getElementById("enemyHPText").innerText = Math.max(enemyHP, 0);
+      document.getElementById("zapHPBar").style.width = Math.max(zapHP, 0) + "%";
+      document.getElementById("enemyHPBar").style.width = Math.max(enemyHP, 0) + "%";
+    }
+
+    function loadEnemy(index) {
+      const e = enemies[index];
+      enemyHP = e.hp;
+      document.getElementById("enemyName").innerText = e.name;
+      document.getElementById("enemyImg").src = e.img;
+      document.getElementById("enemyHPText").innerText = enemyHP;
+      document.getElementById("enemyHPBar").style.width = "100%";
+      logMessage(`⚔️ A wild ${e.name} appears!`);
+    }
+
+    function attack() {
+      let zapDamage = Math.floor(Math.random() * 20) + 10;
+      enemyHP -= zapDamage;
+      updateHPBars();
+      logMessage(`Zap zapped ${enemies[currentEnemy].name} for ${zapDamage} damage!`);
+
+      if (enemyHP <= 0) {
+        logMessage(`🎉 ${enemies[currentEnemy].name} has fainted!`);
+        currentEnemy++;
+        if (currentEnemy < enemies.length) {
+          setTimeout(() => loadEnemy(currentEnemy), 1000);
+        } else {
+          logMessage("🏆 Zap defeated all enemies! You win!");
+          disableButtons();
+        }
+        return;
+      }
+
+      setTimeout(enemyStrike, 1000);
+    }
+
+    function heal() {
+      let zapHeal = Math.floor(Math.random() * 15) + 10;
+      zapHP = Math.min(zapHP + zapHeal, 100);
+      updateHPBars();
+      logMessage(`Zap recharged and healed ${zapHeal} HP!`);
+
+      setTimeout(enemyStrike, 1000);
+    }
+
+    function enemyStrike() {
+      let enemyDamage = Math.floor(Math.random() * 15) + 5;
+      zapHP -= enemyDamage;
+      updateHPBars();
+      logMessage(`${enemies[currentEnemy].name} strikes back for ${enemyDamage} damage!`);
+
+      if (zapHP <= 0) {
+        logMessage("💀 Zap has been defeated. Game over.");
+        disableButtons();
+      }
+    }
+
+    function disableButtons() {
+      document.querySelectorAll("button").forEach(btn => btn.disabled = true);
+    }
+
+    loadEnemy(currentEnemy);
+  </script>
+</body>
+</html>
